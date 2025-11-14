@@ -94,7 +94,6 @@ type Profile = {
   email: string;
   phone?: string;
   avatarUrl?: string;
-  bio?: string;
 };
 
 type NotificationPrefs = {
@@ -116,7 +115,6 @@ export type UserProfileProps = {
   paymentMethods?: PaymentMethod[];
   notificationPrefs?: NotificationPrefs;
   onUpdateProfile?: (data: Profile) => Promise<void> | void;
-  onChangePassword?: (current: string, next: string) => Promise<void> | void;
   onAddAddress?: (address: Omit<Address, "id">) => Promise<Address | void> | void;
   onUpdateAddress?: (address: Address) => Promise<void> | void;
   onDeleteAddress?: (id: string) => Promise<void> | void;
@@ -237,7 +235,6 @@ const fallbackProfile: Profile = {
   email: "alex.johnson@example.com",
   phone: "+1 (555) 234-5678",
   avatarUrl: "",
-  bio: "Lover of simple design and great products.",
 };
 
 const fallbackPrefs: NotificationPrefs = {
@@ -284,7 +281,6 @@ export default function UserProfile({
   paymentMethods: paymentProp,
   notificationPrefs: prefsProp,
   onUpdateProfile,
-  onChangePassword,
   onAddAddress,
   onUpdateAddress,
   onDeleteAddress,
@@ -315,10 +311,6 @@ export default function UserProfile({
       }
     };
   }, []);
-
-  // Form state for password
-  const [pwLoading, setPwLoading] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
 
   // Support form
   const [supportLoading, setSupportLoading] = useState(false);
@@ -369,7 +361,6 @@ export default function UserProfile({
       lastName: String(data.get("lastName") || "").trim(),
       email: String(data.get("email") || "").trim(),
       phone: String(data.get("phone") || "").trim(),
-      bio: String(data.get("bio") || "").trim(),
       avatarUrl: avatarPreview || profile.avatarUrl || "",
     };
 
@@ -383,38 +374,6 @@ export default function UserProfile({
       toast.success("Profile updated");
     } catch {
       toast.error("Failed to update profile. Please try again.");
-    }
-  }
-
-  async function changePassword(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (pwLoading) return;
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    const current = String(data.get("currentPassword") || "");
-    const next = String(data.get("newPassword") || "");
-    const confirm = String(data.get("confirmPassword") || "");
-    if (!current || !next) {
-      toast.error("Please fill in all password fields.");
-      return;
-    }
-    if (next.length < 8) {
-      toast.error("New password must be at least 8 characters.");
-      return;
-    }
-    if (next !== confirm) {
-      toast.error("New passwords do not match.");
-      return;
-    }
-    setPwLoading(true);
-    try {
-      await onChangePassword?.(current, next);
-      form.reset();
-      toast.success("Password updated");
-    } catch {
-      toast.error("Could not update password.");
-    } finally {
-      setPwLoading(false);
     }
   }
 
@@ -797,72 +756,10 @@ export default function UserProfile({
                       />
                     </div>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="bio">Bio</Label>
-                    <Textarea
-                      id="bio"
-                      name="bio"
-                      defaultValue={profile.bio}
-                      rows={3}
-                      placeholder="Tell us a little about yourself"
-                      className="resize-y"
-                    />
-                  </div>
                 </div>
               </div>
               <div className="flex justify-end gap-2">
                 <Button type="submit">Save changes</Button>
-              </div>
-            </form>
-
-            <Separator />
-
-            <form onSubmit={changePassword} className="grid gap-4" aria-label="Change password">
-              <h4 className="text-base sm:text-lg font-semibold flex items-center gap-2">
-                <Lock className="h-4 w-4" /> Password
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="currentPassword">Current password</Label>
-                  <Input id="currentPassword" name="currentPassword" type="password" required />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="newPassword">New password</Label>
-                  <Input
-                    id="newPassword"
-                    name="newPassword"
-                    type={showNewPassword ? "text" : "password"}
-                    required
-                    minLength={8}
-                  />
-                  <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="confirmPassword">Confirm password</Label>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showNewPassword ? "text" : "password"}
-                    required
-                    minLength={8}
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="showPass"
-                    checked={showNewPassword}
-                    onCheckedChange={(v) => setShowNewPassword(Boolean(v))}
-                    aria-label="Toggle password visibility"
-                  />
-                  <Label htmlFor="showPass" className="text-sm">
-                    Show passwords
-                  </Label>
-                </div>
-                <Button type="submit" disabled={pwLoading}>
-                  {pwLoading ? "Updating..." : "Update password"}
-                </Button>
               </div>
             </form>
           </div>
