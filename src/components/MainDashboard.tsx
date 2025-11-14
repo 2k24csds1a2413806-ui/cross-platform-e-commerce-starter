@@ -1,163 +1,163 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   LayoutDashboard,
   PanelLeft,
   ChartSpline,
   SquareMenu,
-  LayoutTemplate,
-} from "lucide-react"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+  LayoutTemplate } from
+"lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar"
+  AvatarFallback } from
+"@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+  DropdownMenuSeparator } from
+"@/components/ui/dropdown-menu";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
+  CardTitle } from
+"@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+  SheetTrigger } from
+"@/components/ui/sheet";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+  TabsTrigger } from
+"@/components/ui/tabs";
 
 type KPI = {
-  label: string
-  value: string
-  delta?: { value: string; positive?: boolean }
-}
+  label: string;
+  value: string;
+  delta?: {value: string;positive?: boolean;};
+};
 
 type Order = {
-  id: string
-  customer: string
-  total: string
-  status: "Paid" | "Pending" | "Refunded"
-  date: string
-}
+  id: string;
+  customer: string;
+  total: string;
+  status: "Paid" | "Pending" | "Refunded";
+  date: string;
+};
 
 type Activity = {
-  id: string
-  time: string
-  text: string
-  meta?: string
-}
+  id: string;
+  time: string;
+  text: string;
+  meta?: string;
+};
 
 export interface MainDashboardProps {
-  className?: string
-  onNavigate?: (section: string) => void
-  kpis?: KPI[]
-  recentOrders?: Order[]
-  activity?: Activity[]
+  className?: string;
+  onNavigate?: (section: string) => void;
+  kpis?: KPI[];
+  recentOrders?: Order[];
+  activity?: Activity[];
 }
 
 const defaultKpis: KPI[] = [
-  { label: "Revenue", value: "₹48,920", delta: { value: "+8.2%", positive: true } },
-  { label: "Orders", value: "1,284", delta: { value: "+2.4%", positive: true } },
-  { label: "Customers", value: "3,742", delta: { value: "+1.1%", positive: true } },
-  { label: "Refunds", value: "₹1,090", delta: { value: "-0.6%" } },
-]
+{ label: "Revenue", value: "₹48,920", delta: { value: "+8.2%", positive: true } },
+{ label: "Orders", value: "1,284", delta: { value: "+2.4%", positive: true } },
+{ label: "Customers", value: "3,742", delta: { value: "+1.1%", positive: true } },
+{ label: "Refunds", value: "₹1,090", delta: { value: "-0.6%" } }];
+
 
 const defaultOrders: Order[] = [
-  { id: "#1024", customer: "Alex Morgan", total: "₹129.00", status: "Paid", date: "2h ago" },
-  { id: "#1023", customer: "Jordan Lee", total: "₹82.50", status: "Pending", date: "4h ago" },
-  { id: "#1022", customer: "Taylor Kim", total: "₹245.99", status: "Paid", date: "Yesterday" },
-  { id: "#1021", customer: "Sam Rivers", total: "₹59.40", status: "Refunded", date: "Yesterday" },
-]
+{ id: "#1024", customer: "Alex Morgan", total: "₹129.00", status: "Paid", date: "2h ago" },
+{ id: "#1023", customer: "Jordan Lee", total: "₹82.50", status: "Pending", date: "4h ago" },
+{ id: "#1022", customer: "Taylor Kim", total: "₹245.99", status: "Paid", date: "Yesterday" },
+{ id: "#1021", customer: "Sam Rivers", total: "₹59.40", status: "Refunded", date: "Yesterday" }];
+
 
 const defaultActivity: Activity[] = [
-  { id: "a1", time: "Now", text: "New order placed by Alex Morgan", meta: "#1025" },
-  { id: "a2", time: "2h", text: "Low inventory on \"Canvas Backpack\"", meta: "6 left" },
-  { id: "a3", time: "4h", text: "Payout processed to bank", meta: "₹3,200" },
-  { id: "a4", time: "Yesterday", text: "New customer signed up", meta: "olivia@…" },
-]
+{ id: "a1", time: "Now", text: "New order placed by Alex Morgan", meta: "#1025" },
+{ id: "a2", time: "2h", text: "Low inventory on \"Canvas Backpack\"", meta: "6 left" },
+{ id: "a3", time: "4h", text: "Payout processed to bank", meta: "₹3,200" },
+{ id: "a4", time: "Yesterday", text: "New customer signed up", meta: "olivia@…" }];
+
 
 export default function MainDashboard({
   className,
   onNavigate,
   kpis = defaultKpis,
   recentOrders = defaultOrders,
-  activity = defaultActivity,
+  activity = defaultActivity
 }: MainDashboardProps) {
-  const [mobileOpen, setMobileOpen] = React.useState(false)
-  const [search, setSearch] = React.useState("")
-  const [range, setRange] = React.useState<"7d" | "30d" | "90d">("7d")
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const [range, setRange] = React.useState<"7d" | "30d" | "90d">("7d");
 
   // Sales Analyzer state
-  type SalesRow = { id: string; product: string; qty: number; price: number; cost: number }
-  const [period, setPeriod] = React.useState<"monthly" | "yearly">("monthly")
+  type SalesRow = {id: string;product: string;qty: number;price: number;cost: number;};
+  const [period, setPeriod] = React.useState<"monthly" | "yearly">("monthly");
   const [rows, setRows] = React.useState<SalesRow[]>([
-    { id: "r-1", product: "", qty: 0, price: 0, cost: 0 },
-  ])
+  { id: "r-1", product: "", qty: 0, price: 0, cost: 0 }]
+  );
 
   const totals = React.useMemo(() => {
-    const revenue = rows.reduce((s, r) => s + (Number(r.qty) || 0) * (Number(r.price) || 0), 0)
-    const cost = rows.reduce((s, r) => s + (Number(r.qty) || 0) * (Number(r.cost) || 0), 0)
-    const profit = revenue - cost
-    const margin = revenue > 0 ? profit / revenue : 0
-    return { revenue, cost, profit, margin }
-  }, [rows])
+    const revenue = rows.reduce((s, r) => s + (Number(r.qty) || 0) * (Number(r.price) || 0), 0);
+    const cost = rows.reduce((s, r) => s + (Number(r.qty) || 0) * (Number(r.cost) || 0), 0);
+    const profit = revenue - cost;
+    const margin = revenue > 0 ? profit / revenue : 0;
+    return { revenue, cost, profit, margin };
+  }, [rows]);
 
   const aiSummary = React.useMemo(() => {
-    const fmt = (n: number) => n.toLocaleString(undefined, { style: "currency", currency: "INR" })
-    const status = totals.profit === 0 ? "breakeven" : totals.profit > 0 ? "profit" : "loss"
-    const top = rows
-      .map((r) => ({
-        product: r.product || "Untitled",
-        p: (Number(r.qty) || 0) * ((Number(r.price) || 0) - (Number(r.cost) || 0)),
-      }))
-      .sort((a, b) => b.p - a.p)[0]
-    const topLine = top && top.p !== 0 ? ` Top contributor: ${top.product} (${fmt(Math.abs(top.p))} ${top.p >= 0 ? "profit" : "loss"}).` : ""
-    return `AI analysis (${period}): ${status.toUpperCase()} of ${fmt(Math.abs(totals.profit))} with revenue ${fmt(totals.revenue)} and cost ${fmt(totals.cost)}. Gross margin ${(totals.margin * 100).toFixed(1)}%.${topLine}`
-  }, [totals, rows, period])
+    const fmt = (n: number) => n.toLocaleString(undefined, { style: "currency", currency: "INR" });
+    const status = totals.profit === 0 ? "breakeven" : totals.profit > 0 ? "profit" : "loss";
+    const top = rows.
+    map((r) => ({
+      product: r.product || "Untitled",
+      p: (Number(r.qty) || 0) * ((Number(r.price) || 0) - (Number(r.cost) || 0))
+    })).
+    sort((a, b) => b.p - a.p)[0];
+    const topLine = top && top.p !== 0 ? ` Top contributor: ${top.product} (${fmt(Math.abs(top.p))} ${top.p >= 0 ? "profit" : "loss"}).` : "";
+    return `AI analysis (${period}): ${status.toUpperCase()} of ${fmt(Math.abs(totals.profit))} with revenue ${fmt(totals.revenue)} and cost ${fmt(totals.cost)}. Gross margin ${(totals.margin * 100).toFixed(1)}%.${topLine}`;
+  }, [totals, rows, period]);
 
   function updateRow(id: string, patch: Partial<SalesRow>) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)))
+    setRows((prev) => prev.map((r) => r.id === id ? { ...r, ...patch } : r));
   }
   function addRow() {
-    setRows((prev) => [...prev, { id: `r-${Date.now()}`, product: "", qty: 0, price: 0, cost: 0 }])
+    setRows((prev) => [...prev, { id: `r-${Date.now()}`, product: "", qty: 0, price: 0, cost: 0 }]);
   }
   function removeRow(id: string) {
-    setRows((prev) => (prev.length > 1 ? prev.filter((r) => r.id !== id) : prev))
+    setRows((prev) => prev.length > 1 ? prev.filter((r) => r.id !== id) : prev);
   }
 
   function handleQuickAction(action: string) {
-    toast(`${action}`, { description: "This is a demo action." })
+    toast(`${action}`, { description: "This is a demo action." });
   }
 
   function handleNavigate(section: string) {
-    onNavigate?.(section)
-    toast("Navigate", { description: `Go to ${section}` })
+    onNavigate?.(section);
+    toast("Navigate", { description: `Go to ${section}` });
   }
 
   return (
     <section className={cn("w-full bg-background text-foreground", className)}>
       <div className="w-full max-w-full rounded-2xl bg-card shadow-sm ring-1 ring-border">
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+        <div className="flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 border-b border-border !w-[782px] !h-[79px]">
           <div className="flex items-center gap-2">
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
@@ -165,13 +165,13 @@ export default function MainDashboard({
                   variant="secondary"
                   size="icon"
                   className="sm:hidden"
-                  aria-label="Open navigation"
-                >
+                  aria-label="Open navigation">
+
                   <PanelLeft className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-[280px]">
-                <MobileSidebar onNavigate={(s) => { handleNavigate(s); setMobileOpen(false) }} />
+                <MobileSidebar onNavigate={(s) => {handleNavigate(s);setMobileOpen(false);}} />
               </SheetContent>
             </Sheet>
             <div className="hidden sm:flex items-center gap-2">
@@ -188,8 +188,8 @@ export default function MainDashboard({
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search orders, customers..."
                   aria-label="Search"
-                  className="w-[200px] lg:w-[320px] bg-secondary border-input focus-visible:ring-ring"
-                />
+                  className="w-[200px] lg:w-[320px] bg-secondary border-input focus-visible:ring-ring" />
+
               </div>
             </div>
 
@@ -281,44 +281,44 @@ export default function MainDashboard({
                         </div>
                         <Separator />
                         {rows.map((r) => {
-                          const rowPL = (Number(r.qty) || 0) * ((Number(r.price) || 0) - (Number(r.cost) || 0))
+                          const rowPL = (Number(r.qty) || 0) * ((Number(r.price) || 0) - (Number(r.cost) || 0));
                           return (
                             <div key={r.id} className="grid grid-cols-12 gap-2 items-center">
                               <Input
                                 value={r.product}
                                 onChange={(e) => updateRow(r.id, { product: e.target.value })}
                                 placeholder="Product name"
-                                className="col-span-4 bg-secondary border-input"
-                              />
+                                className="col-span-4 bg-secondary border-input" />
+
                               <Input
                                 type="number"
                                 value={r.qty}
                                 onChange={(e) => updateRow(r.id, { qty: Number(e.target.value) })}
                                 placeholder="0"
-                                className="col-span-2 bg-secondary border-input"
-                              />
+                                className="col-span-2 bg-secondary border-input" />
+
                               <Input
                                 type="number"
                                 value={r.price}
                                 onChange={(e) => updateRow(r.id, { price: Number(e.target.value) })}
                                 placeholder="0"
-                                className="col-span-2 bg-secondary border-input"
-                              />
+                                className="col-span-2 bg-secondary border-input" />
+
                               <Input
                                 type="number"
                                 value={r.cost}
                                 onChange={(e) => updateRow(r.id, { cost: Number(e.target.value) })}
                                 placeholder="0"
-                                className="col-span-2 bg-secondary border-input"
-                              />
+                                className="col-span-2 bg-secondary border-input" />
+
                               <div className={cn("col-span-2 text-right text-sm", rowPL >= 0 ? "text-success" : "text-destructive")}>
                                 {rowPL.toLocaleString(undefined, { style: "currency", currency: "INR" })}
                               </div>
                               <div className="col-span-12 flex justify-end">
                                 <Button variant="ghost" size="sm" onClick={() => removeRow(r.id)}>Remove</Button>
                               </div>
-                            </div>
-                          )
+                            </div>);
+
                         })}
                         <div className="flex items-center justify-between pt-2">
                           <Button variant="secondary" onClick={addRow}>Add row</Button>
@@ -357,28 +357,28 @@ export default function MainDashboard({
 
                 {/* KPIs */}
                 <section aria-label="Key metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                  {kpis.map((k) => (
-                    <Card key={k.label} className="bg-card border-border">
+                  {kpis.map((k) =>
+                  <Card key={k.label} className="bg-card border-border">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm text-muted-foreground">{k.label}</CardTitle>
                       </CardHeader>
                       <CardContent className="flex items-end justify-between">
                         <div className="text-2xl font-semibold">{k.value}</div>
-                        {k.delta && (
-                          <Badge
-                            variant="secondary"
-                            className={cn(
-                              "rounded-full",
-                              k.delta.positive ? "bg-success-soft text-success" : "bg-muted text-foreground"
-                            )}
-                            aria-label={`${k.delta.positive ? "Increase" : "Decrease"} ${k.delta.value}`}
-                          >
+                        {k.delta &&
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "rounded-full",
+                          k.delta.positive ? "bg-success-soft text-success" : "bg-muted text-foreground"
+                        )}
+                        aria-label={`${k.delta.positive ? "Increase" : "Decrease"} ${k.delta.value}`}>
+
                             {k.delta.value}
                           </Badge>
-                        )}
+                      }
                       </CardContent>
                     </Card>
-                  ))}
+                  )}
                 </section>
 
                 {/* Charts and recent orders */}
@@ -392,8 +392,8 @@ export default function MainDashboard({
                       <Tabs
                         value={range}
                         onValueChange={(v) => setRange(v as typeof range)}
-                        className="w-full sm:w-auto"
-                      >
+                        className="w-full sm:w-auto">
+
                         <TabsList className="grid w-full grid-cols-3">
                           <TabsTrigger value="7d">7d</TabsTrigger>
                           <TabsTrigger value="30d">30d</TabsTrigger>
@@ -415,8 +415,8 @@ export default function MainDashboard({
                     <CardContent className="p-0">
                       <Separator />
                       <ul className="max-w-full">
-                        {recentOrders.map((o) => (
-                          <li key={o.id} className="flex items-center gap-3 px-4 py-3">
+                        {recentOrders.map((o) =>
+                        <li key={o.id} className="flex items-center gap-3 px-4 py-3">
                             <div className="size-8 rounded-lg bg-secondary grid place-items-center shrink-0">
                               <SquareMenu className="h-4 w-4" aria-hidden="true" />
                             </div>
@@ -429,16 +429,16 @@ export default function MainDashboard({
                                 <p className="text-sm text-muted-foreground truncate">{o.id}</p>
                                 <div className="flex items-center gap-2 shrink-0">
                                   <Badge
-                                    variant="secondary"
-                                    className={cn(
-                                      "rounded-full",
-                                      o.status === "Paid"
-                                        ? "bg-success-soft text-success"
-                                        : o.status === "Refunded"
-                                        ? "bg-muted text-foreground"
-                                        : "bg-accent text-foreground"
-                                    )}
-                                  >
+                                  variant="secondary"
+                                  className={cn(
+                                    "rounded-full",
+                                    o.status === "Paid" ?
+                                    "bg-success-soft text-success" :
+                                    o.status === "Refunded" ?
+                                    "bg-muted text-foreground" :
+                                    "bg-accent text-foreground"
+                                  )}>
+
                                     {o.status}
                                   </Badge>
                                   <p className="text-sm font-medium">{o.total}</p>
@@ -446,7 +446,7 @@ export default function MainDashboard({
                               </div>
                             </div>
                           </li>
-                        ))}
+                        )}
                       </ul>
                       <div className="px-4 py-3">
                         <Button variant="secondary" className="w-full" onClick={() => handleNavigate("orders")}>
@@ -466,8 +466,8 @@ export default function MainDashboard({
                     <CardContent className="p-0">
                       <Separator />
                       <ul className="divide-y divide-border">
-                        {activity.map((a) => (
-                          <li key={a.id} className="px-4 py-3 flex items-start gap-3">
+                        {activity.map((a) =>
+                        <li key={a.id} className="px-4 py-3 flex items-start gap-3">
                             <div className="mt-1 size-2.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
                             <div className="min-w-0 flex-1">
                               <p className="text-sm break-words">
@@ -476,7 +476,7 @@ export default function MainDashboard({
                               <p className="text-xs text-muted-foreground mt-1">{a.time}</p>
                             </div>
                           </li>
-                        ))}
+                        )}
                       </ul>
                     </CardContent>
                   </Card>
@@ -510,19 +510,19 @@ export default function MainDashboard({
           </main>
         </div>
       </div>
-    </section>
-  )
+    </section>);
+
 }
 
-function DesktopSidebar({ onNavigate }: { onNavigate?: (s: string) => void }) {
+function DesktopSidebar({ onNavigate }: {onNavigate?: (s: string) => void;}) {
   const items = [
-    { key: "dashboard", label: "Overview", icon: LayoutDashboard },
-    { key: "orders", label: "Orders", icon: SquareMenu },
-    { key: "products", label: "Products", icon: SquareMenu },
-    { key: "customers", label: "Customers", icon: LayoutTemplate },
-    { key: "analytics", label: "Analytics", icon: ChartSpline },
-    { key: "settings", label: "Settings", icon: LayoutTemplate },
-  ] as const
+  { key: "dashboard", label: "Overview", icon: LayoutDashboard },
+  { key: "orders", label: "Orders", icon: SquareMenu },
+  { key: "products", label: "Products", icon: SquareMenu },
+  { key: "customers", label: "Customers", icon: LayoutTemplate },
+  { key: "analytics", label: "Analytics", icon: ChartSpline },
+  { key: "settings", label: "Settings", icon: LayoutTemplate }] as
+  const;
 
   return (
     <nav aria-label="Main" className="p-3">
@@ -539,24 +539,24 @@ function DesktopSidebar({ onNavigate }: { onNavigate?: (s: string) => void }) {
       </div>
       <Separator className="my-2" />
       <ul className="space-y-1">
-        {items.map((item) => (
-          <li key={item.key}>
+        {items.map((item) =>
+        <li key={item.key}>
             <Button
-              variant="ghost"
-              className="w-full justify-start gap-2 rounded-lg data-[state=active]:bg-secondary"
-              onClick={() => onNavigate?.(item.key)}
-            >
+            variant="ghost"
+            className="w-full justify-start gap-2 rounded-lg data-[state=active]:bg-secondary"
+            onClick={() => onNavigate?.(item.key)}>
+
               <item.icon className="h-4 w-4" aria-hidden="true" />
               <span className="text-sm">{item.label}</span>
             </Button>
           </li>
-        ))}
+        )}
       </ul>
-    </nav>
-  )
+    </nav>);
+
 }
 
-function MobileSidebar({ onNavigate }: { onNavigate?: (s: string) => void }) {
+function MobileSidebar({ onNavigate }: {onNavigate?: (s: string) => void;}) {
   return (
     <div className="h-full bg-card">
       <div className="p-4 border-b border-border">
@@ -610,38 +610,38 @@ function MobileSidebar({ onNavigate }: { onNavigate?: (s: string) => void }) {
           </li>
         </ul>
       </nav>
-    </div>
-  )
+    </div>);
+
 }
 
-function ResponsiveMiniChart({ range }: { range: "7d" | "30d" | "90d" }) {
+function ResponsiveMiniChart({ range }: {range: "7d" | "30d" | "90d";}) {
   // Lightweight SVG chart; data mocked by range
   const data = React.useMemo(() => {
-    const length = range === "7d" ? 7 : range === "30d" ? 30 : 18
-    const base = range === "7d" ? 60 : range === "30d" ? 50 : 55
+    const length = range === "7d" ? 7 : range === "30d" ? 30 : 18;
+    const base = range === "7d" ? 60 : range === "30d" ? 50 : 55;
     return Array.from({ length }, (_, i) => {
-      const variance = Math.sin(i / (range === "7d" ? 1.4 : 2.6)) * 14
-      const noise = (i % 3) * 3
-      return Math.max(12, base + variance + noise)
-    })
-  }, [range])
+      const variance = Math.sin(i / (range === "7d" ? 1.4 : 2.6)) * 14;
+      const noise = i % 3 * 3;
+      return Math.max(12, base + variance + noise);
+    });
+  }, [range]);
 
-  const max = Math.max(...data)
-  const min = Math.min(...data)
-  const padding = 8
-  const w = 600
-  const h = 220
-  const stepX = (w - padding * 2) / Math.max(1, data.length - 1)
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const padding = 8;
+  const w = 600;
+  const h = 220;
+  const stepX = (w - padding * 2) / Math.max(1, data.length - 1);
 
-  const points = data
-    .map((v, i) => {
-      const x = padding + i * stepX
-      const y = padding + ((max - v) / Math.max(1, max - min)) * (h - padding * 2)
-      return `${x},${y}`
-    })
-    .join(" ")
+  const points = data.
+  map((v, i) => {
+    const x = padding + i * stepX;
+    const y = padding + (max - v) / Math.max(1, max - min) * (h - padding * 2);
+    return `${x},${y}`;
+  }).
+  join(" ");
 
-  const gradientId = "chartGradient"
+  const gradientId = "chartGradient";
 
   return (
     <div className="w-full">
@@ -650,8 +650,8 @@ function ResponsiveMiniChart({ range }: { range: "7d" | "30d" | "90d" }) {
           viewBox={`0 0 ${w} ${h}`}
           role="img"
           aria-label="Sales over time"
-          className="block w-full h-auto"
-        >
+          className="block w-full h-auto">
+
           <defs>
             <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor="var(--chart-3)" stopOpacity="0.35" />
@@ -661,7 +661,7 @@ function ResponsiveMiniChart({ range }: { range: "7d" | "30d" | "90d" }) {
 
           {/* Grid lines */}
           {[0, 1, 2, 3].map((i) => {
-            const y = padding + (i / 3) * (h - padding * 2)
+            const y = padding + i / 3 * (h - padding * 2);
             return (
               <line
                 key={i}
@@ -671,17 +671,17 @@ function ResponsiveMiniChart({ range }: { range: "7d" | "30d" | "90d" }) {
                 y2={y}
                 stroke="var(--border)"
                 strokeWidth="1"
-                strokeDasharray="4 4"
-              />
-            )
+                strokeDasharray="4 4" />);
+
+
           })}
 
           {/* Area */}
           <polyline
             points={`${points} ${w - padding},${h - padding} ${padding},${h - padding}`}
             fill={`url(#${gradientId})`}
-            stroke="none"
-          />
+            stroke="none" />
+
 
           {/* Line */}
           <polyline
@@ -690,19 +690,19 @@ function ResponsiveMiniChart({ range }: { range: "7d" | "30d" | "90d" }) {
             stroke="var(--chart-3)"
             strokeWidth="2.5"
             strokeLinejoin="round"
-            strokeLinecap="round"
-          />
+            strokeLinecap="round" />
+
 
           {/* Last point indicator */}
           {(() => {
-            const last = data.length - 1
-            const x = padding + last * stepX
-            const y = padding + ((max - data[last]) / Math.max(1, max - min)) * (h - padding * 2)
+            const last = data.length - 1;
+            const x = padding + last * stepX;
+            const y = padding + (max - data[last]) / Math.max(1, max - min) * (h - padding * 2);
             return (
               <>
                 <circle cx={x} cy={y} r="4.5" fill="var(--card)" stroke="var(--chart-3)" strokeWidth="2" />
-              </>
-            )
+              </>);
+
           })()}
         </svg>
       </div>
@@ -713,6 +713,6 @@ function ResponsiveMiniChart({ range }: { range: "7d" | "30d" | "90d" }) {
           Sales
         </div>
       </div>
-    </div>
-  )
+    </div>);
+
 }
