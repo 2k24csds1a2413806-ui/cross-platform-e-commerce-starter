@@ -9,6 +9,11 @@ import {
   User,
   UserPen,
   Contact,
+  Moon,
+  Sun,
+  Globe,
+  DollarSign,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -105,6 +110,15 @@ type NotificationPrefs = {
   push: boolean;
 };
 
+type AppSettings = {
+  darkMode: boolean;
+  language: string;
+  currency: string;
+  timezone: string;
+  compactView: boolean;
+  autoSave: boolean;
+};
+
 export type UserProfileProps = {
   className?: string;
   style?: React.CSSProperties;
@@ -114,6 +128,7 @@ export type UserProfileProps = {
   addresses?: Address[];
   paymentMethods?: PaymentMethod[];
   notificationPrefs?: NotificationPrefs;
+  appSettings?: AppSettings;
   onUpdateProfile?: (data: Profile) => Promise<void> | void;
   onAddAddress?: (address: Omit<Address, "id">) => Promise<Address | void> | void;
   onUpdateAddress?: (address: Address) => Promise<void> | void;
@@ -122,6 +137,7 @@ export type UserProfileProps = {
   onDeletePayment?: (id: string) => Promise<void> | void;
   onSetDefaultPayment?: (id: string) => Promise<void> | void;
   onUpdateNotifications?: (prefs: NotificationPrefs) => Promise<void> | void;
+  onUpdateAppSettings?: (settings: AppSettings) => Promise<void> | void;
   onDeleteAccount?: () => Promise<void> | void;
   onRequestReturn?: (orderId: string, reason: string, details?: string) => Promise<void> | void;
   onReorder?: (orderId: string) => Promise<void> | void;
@@ -246,6 +262,15 @@ const fallbackPrefs: NotificationPrefs = {
   push: true,
 };
 
+const fallbackAppSettings: AppSettings = {
+  darkMode: false,
+  language: "en",
+  currency: "INR",
+  timezone: "Asia/Kolkata",
+  compactView: false,
+  autoSave: true,
+};
+
 function formatCurrency(n: number) {
   try {
     return new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n);
@@ -280,6 +305,7 @@ export default function UserProfile({
   addresses: addressesProp,
   paymentMethods: paymentProp,
   notificationPrefs: prefsProp,
+  appSettings: appSettingsProp,
   onUpdateProfile,
   onAddAddress,
   onUpdateAddress,
@@ -288,6 +314,7 @@ export default function UserProfile({
   onDeletePayment,
   onSetDefaultPayment,
   onUpdateNotifications,
+  onUpdateAppSettings,
   onDeleteAccount,
   onRequestReturn,
   onReorder,
@@ -299,6 +326,7 @@ export default function UserProfile({
   const [addresses, setAddresses] = useState<Address[]>(addressesProp || fallbackAddresses);
   const [payments, setPayments] = useState<PaymentMethod[]>(paymentProp || fallbackPayments);
   const [prefs, setPrefs] = useState<NotificationPrefs>(prefsProp || fallbackPrefs);
+  const [appSettings, setAppSettings] = useState<AppSettings>(appSettingsProp || fallbackAppSettings);
 
   // Profile image preview
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(profile.avatarUrl || undefined);
@@ -565,6 +593,32 @@ export default function UserProfile({
       toast.error("Failed to save preferences.");
     }
   }
+
+  async function saveAppSettings(next: AppSettings) {
+    setAppSettings(next);
+    try {
+      await onUpdateAppSettings?.(next);
+      toast.success("Settings saved");
+      
+      // Apply dark mode
+      if (next.darkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } catch {
+      toast.error("Failed to save settings.");
+    }
+  }
+
+  // Apply dark mode on mount
+  useEffect(() => {
+    if (appSettings.darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [appSettings.darkMode]);
 
   async function deleteAccount() {
     try {
@@ -1134,6 +1188,153 @@ export default function UserProfile({
 
         <TabsContent value="settings" className="mt-6">
           <div className="grid gap-8">
+            {/* Appearance Settings */}
+            <div className="grid gap-4">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Settings2 className="h-5 w-5" />
+                Appearance
+              </h4>
+              <div className="grid gap-3">
+                <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-secondary p-3">
+                  <div className="min-w-0 flex items-center gap-3">
+                    {appSettings.darkMode ? (
+                      <Moon className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <Sun className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <div>
+                      <p className="font-medium">Dark mode</p>
+                      <p className="text-sm text-muted-foreground">
+                        Switch between light and dark theme
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={appSettings.darkMode}
+                    onCheckedChange={(v) => saveAppSettings({ ...appSettings, darkMode: Boolean(v) })}
+                    aria-label="Dark mode"
+                  />
+                </div>
+                
+                <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-secondary p-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">Compact view</p>
+                    <p className="text-sm text-muted-foreground">
+                      Display more information in less space
+                    </p>
+                  </div>
+                  <Switch
+                    checked={appSettings.compactView}
+                    onCheckedChange={(v) => saveAppSettings({ ...appSettings, compactView: Boolean(v) })}
+                    aria-label="Compact view"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Regional Settings */}
+            <div className="grid gap-4">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Regional settings
+              </h4>
+              <div className="grid gap-3">
+                <div className="grid gap-2">
+                  <Label htmlFor="language" className="flex items-center gap-2">
+                    <Globe className="h-4 w-4" />
+                    Language
+                  </Label>
+                  <Select
+                    value={appSettings.language}
+                    onValueChange={(v) => saveAppSettings({ ...appSettings, language: v })}
+                  >
+                    <SelectTrigger id="language">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="de">Deutsch</SelectItem>
+                      <SelectItem value="hi">हिन्दी</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="currency" className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Currency
+                  </Label>
+                  <Select
+                    value={appSettings.currency}
+                    onValueChange={(v) => saveAppSettings({ ...appSettings, currency: v })}
+                  >
+                    <SelectTrigger id="currency">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="INR">INR (₹)</SelectItem>
+                      <SelectItem value="USD">USD ($)</SelectItem>
+                      <SelectItem value="EUR">EUR (€)</SelectItem>
+                      <SelectItem value="GBP">GBP (£)</SelectItem>
+                      <SelectItem value="JPY">JPY (¥)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="timezone" className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Timezone
+                  </Label>
+                  <Select
+                    value={appSettings.timezone}
+                    onValueChange={(v) => saveAppSettings({ ...appSettings, timezone: v })}
+                  >
+                    <SelectTrigger id="timezone">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Asia/Kolkata">Asia/Kolkata (IST)</SelectItem>
+                      <SelectItem value="America/New_York">America/New_York (EST)</SelectItem>
+                      <SelectItem value="America/Los_Angeles">America/Los_Angeles (PST)</SelectItem>
+                      <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
+                      <SelectItem value="Asia/Tokyo">Asia/Tokyo (JST)</SelectItem>
+                      <SelectItem value="Australia/Sydney">Australia/Sydney (AEST)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Data Settings */}
+            <div className="grid gap-4">
+              <h4 className="font-semibold">Data & Privacy</h4>
+              <div className="grid gap-3">
+                <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-secondary p-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">Auto-save</p>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically save your work as you type
+                    </p>
+                  </div>
+                  <Switch
+                    checked={appSettings.autoSave}
+                    onCheckedChange={(v) => saveAppSettings({ ...appSettings, autoSave: Boolean(v) })}
+                    aria-label="Auto-save"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Notifications */}
             <div className="grid gap-4">
               <h4 className="font-semibold">Notifications</h4>
               <div className="grid gap-3">

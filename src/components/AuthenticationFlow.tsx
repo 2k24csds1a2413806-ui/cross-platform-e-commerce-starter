@@ -118,7 +118,7 @@ export default function AuthenticationFlow({
         return { title: "Create your account", desc: "Start your journey in a minute" }
       case "forgot":
         return resetStage === "request"
-          ? { title: "Reset your password", desc: "We’ll send a verification code to your email" }
+          ? { title: "Reset your password", desc: "We'll send a verification code to your email" }
           : { title: "Verify and update", desc: "Enter the code and set a new password" }
       default:
         return { title: "", desc: "" }
@@ -186,7 +186,7 @@ export default function AuthenticationFlow({
 
   function SocialButtons() {
     return (
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2">
         <Button
           type="button"
           variant="outline"
@@ -206,26 +206,6 @@ export default function AuthenticationFlow({
         >
           <UserRound className="mr-2 h-4 w-4" aria-hidden="true" />
           Continue with Google
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full bg-card hover:bg-secondary"
-          onClick={async () => {
-            try {
-              setLoading(true)
-              await onSocialLogin?.("github")
-            } catch (e: any) {
-              toast.error(e?.message || "GitHub sign-in failed")
-            } finally {
-              setLoading(false)
-            }
-          }}
-          aria-label="Continue with GitHub"
-          disabled={loading}
-        >
-          <LogIn className="mr-2 h-4 w-4" aria-hidden="true" />
-          Continue with GitHub
         </Button>
       </div>
     )

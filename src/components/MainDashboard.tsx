@@ -6,7 +6,9 @@ import {
   PanelLeft,
   ChartSpline,
   SquareMenu,
-  LayoutTemplate } from
+  LayoutTemplate,
+  Plus,
+  Trash2 } from
 "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -112,6 +114,7 @@ export default function MainDashboard({
   const [rows, setRows] = React.useState<SalesRow[]>([
   { id: "r-1", product: "", qty: 0, price: 0, cost: 0 }]
   );
+  const [bulkRowCount, setBulkRowCount] = React.useState(5);
 
   const totals = React.useMemo(() => {
     const revenue = rows.reduce((s, r) => s + (Number(r.qty) || 0) * (Number(r.price) || 0), 0);
@@ -140,8 +143,24 @@ export default function MainDashboard({
   function addRow() {
     setRows((prev) => [...prev, { id: `r-${Date.now()}`, product: "", qty: 0, price: 0, cost: 0 }]);
   }
+  function addBulkRows() {
+    const count = Math.max(1, Math.min(20, bulkRowCount));
+    const newRows = Array.from({ length: count }, (_, i) => ({
+      id: `r-${Date.now()}-${i}`,
+      product: "",
+      qty: 0,
+      price: 0,
+      cost: 0
+    }));
+    setRows((prev) => [...prev, ...newRows]);
+    toast.success(`Added ${count} rows`);
+  }
   function removeRow(id: string) {
     setRows((prev) => prev.length > 1 ? prev.filter((r) => r.id !== id) : prev);
+  }
+  function clearAllRows() {
+    setRows([{ id: `r-${Date.now()}`, product: "", qty: 0, price: 0, cost: 0 }]);
+    toast.message("All rows cleared");
   }
 
   function handleQuickAction(action: string) {
@@ -320,8 +339,32 @@ export default function MainDashboard({
                             </div>);
 
                         })}
-                        <div className="flex items-center justify-between pt-2">
-                          <Button variant="secondary" onClick={addRow}>Add row</Button>
+                        <div className="flex items-center justify-between pt-2 gap-3 flex-wrap">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Button variant="secondary" onClick={addRow}>
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add row
+                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="number"
+                                min="1"
+                                max="20"
+                                value={bulkRowCount}
+                                onChange={(e) => setBulkRowCount(Number(e.target.value))}
+                                className="w-16 h-9 bg-secondary border-input"
+                                aria-label="Number of rows to add"
+                              />
+                              <Button variant="secondary" onClick={addBulkRows}>
+                                <Plus className="h-4 w-4 mr-2" />
+                                Add multiple
+                              </Button>
+                            </div>
+                            <Button variant="ghost" size="sm" onClick={clearAllRows}>
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Clear all
+                            </Button>
+                          </div>
                           <div className="text-sm">
                             <span className="mr-3">Revenue: {totals.revenue.toLocaleString(undefined, { style: "currency", currency: "INR" })}</span>
                             <span className="mr-3">Cost: {totals.cost.toLocaleString(undefined, { style: "currency", currency: "INR" })}</span>
@@ -517,9 +560,6 @@ export default function MainDashboard({
 function DesktopSidebar({ onNavigate }: {onNavigate?: (s: string) => void;}) {
   const items = [
   { key: "dashboard", label: "Overview", icon: LayoutDashboard },
-  { key: "orders", label: "Orders", icon: SquareMenu },
-  { key: "products", label: "Products", icon: SquareMenu },
-  { key: "customers", label: "Customers", icon: LayoutTemplate },
   { key: "analytics", label: "Analytics", icon: ChartSpline },
   { key: "settings", label: "Settings", icon: LayoutTemplate }] as
   const;
@@ -576,24 +616,6 @@ function MobileSidebar({ onNavigate }: {onNavigate?: (s: string) => void;}) {
             <Button variant="ghost" className="w-full justify-start gap-2 rounded-lg" onClick={() => onNavigate?.("dashboard")}>
               <LayoutDashboard className="h-4 w-4" />
               Overview
-            </Button>
-          </li>
-          <li>
-            <Button variant="ghost" className="w-full justify-start gap-2 rounded-lg" onClick={() => onNavigate?.("orders")}>
-              <SquareMenu className="h-4 w-4" />
-              Orders
-            </Button>
-          </li>
-          <li>
-            <Button variant="ghost" className="w-full justify-start gap-2 rounded-lg" onClick={() => onNavigate?.("products")}>
-              <SquareMenu className="h-4 w-4" />
-              Products
-            </Button>
-          </li>
-          <li>
-            <Button variant="ghost" className="w-full justify-start gap-2 rounded-lg" onClick={() => onNavigate?.("customers")}>
-              <LayoutTemplate className="h-4 w-4" />
-              Customers
             </Button>
           </li>
           <li>
